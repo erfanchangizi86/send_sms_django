@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth import login
 from django.shortcuts import render
 from django.views.generic import TemplateView
 # Create your views here.
@@ -28,11 +29,12 @@ class Login(TemplateView):
     def post(self, request, *args, **kwargs):
         code=request.POST.get('code')
         if code == Login.otp:
-            user = User.objects.filter(username=Login.username).filter()
-            if user.exists():
-                pass
+            user = User.objects.filter(username=Login.username,phone=Login.phone_number).first()
+            if user:
+                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             else:
-                User.objects.create(username=Login.username,phone=Login.phone_number)
+                new_user = User.objects.create(username=Login.username,phone=Login.phone_number)
+                login(request,new_user,backend='django.contrib.auth.backends.ModelBackend')
         else:
             print('no')
         context = {}
